@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RustBridge: Java to Rust, verified by the compiler</title>
+<meta name="description" content="RustBridge translates Java into safe, idiomatic Rust, then compiles it, runs it, and repairs it until its output matches your Java program.">
+<meta property="og:title" content="RustBridge: Write familiar. Compile native.">
+<meta property="og:description" content="Java to Rust translation, verified by the Rust compiler and by your program's own output.">
+<meta property="og:url" content="https://rustbridge.auduvanttechnologies.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314161a'/%3E%3Cpath d='M6 21c4-9 16-9 20 0' stroke='%23e8743b' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M9 21v4M23 21v4M16 15v10' stroke='%23e8743b' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0f1114;
+    --panel: #171a1f;
+    --panel-2: #1d2128;
+    --line: #2a2f37;
+    --text: #e7e9ec;
+    --muted: #9aa3ad;
+    --rust: #e8743b;
+    --rust-soft: rgba(232, 116, 59, 0.12);
+    --java: #5b9bd5;
+    --ok: #5fbf7f;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--rust); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  code, pre { font-family: var(--mono); }
+
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(15, 17, 20, 0.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; letter-spacing: -0.01em; }
+  .brand:hover { text-decoration: none; }
+  .brand svg { width: 26px; height: 26px; }
+  .navlinks { display: flex; gap: 24px; font-size: 14px; }
+  .navlinks a { color: var(--muted); }
+  .navlinks a:hover { color: var(--text); text-decoration: none; }
+
+  header.hero { padding: 88px 0 56px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rust); background: var(--rust-soft); border: 1px solid rgba(232, 116, 59, 0.3); padding: 4px 10px; border-radius: 999px; }
+  h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.05; letter-spacing: -0.035em; margin: 20px 0 18px; max-width: 14ch; }
+  h1 em { font-style: normal; color: var(--rust); }
+  .lede { font-size: 19px; color: var(--muted); max-width: 60ch; margin: 0 0 32px; }
+  .install { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; max-width: 760px; font-family: var(--mono); font-size: 14px; }
+  .install .prompt { color: var(--rust); user-select: none; }
+  .install code { flex: 1; overflow-x: auto; white-space: nowrap; }
+  .copy { font: 600 12px var(--sans); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  .copy:hover { border-color: var(--rust); }
+  .sub-links { margin-top: 14px; font-size: 14px; color: var(--muted); }
+
+  section { padding: 64px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 30px; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .section-lede { color: var(--muted); max-width: 62ch; margin: 0 0 32px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .code { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .code .bar { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .code .bar b { font-weight: 600; }
+  .code.java .bar b { color: var(--java); }
+  .code.rust .bar b { color: var(--rust); }
+  .code pre { margin: 0; padding: 16px; font-size: 13.5px; line-height: 1.55; overflow-x: auto; }
+  .kw { color: #c792ea; } .str { color: #c3e88d; } .cm { color: #6b7380; } .ty { color: #82aaff; } .hl { background: rgba(95, 191, 127, 0.14); border-radius: 3px; }
+  .note { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: s; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  .step::before { counter-increment: s; content: counter(s); display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--rust-soft); color: var(--rust); font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .step h3 { margin: 0 0 6px; font-size: 16px; }
+  .step p { margin: 0; font-size: 14px; color: var(--muted); }
+
+  .term { background: #0b0c0e; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; font: 13.5px/1.65 var(--mono); color: #c9cdd2; overflow-x: auto; white-space: pre; margin-top: 24px; }
+  .term .p { color: var(--rust); } .term .ok { color: var(--ok); } .term .dim { color: #6b7380; }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feature { padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+  .feature h3 { margin: 0 0 6px; font-size: 16px; }
+  .feature p { margin: 0; font-size: 14px; color: var(--muted); }
+
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .plan { border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); display: flex; flex-direction: column; }
+  .plan.featured { border-color: var(--rust); box-shadow: 0 0 0 1px var(--rust) inset; }
+  .plan h3 { margin: 0; font-size: 18px; }
+  .price { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; margin: 10px 0 2px; }
+  .price small { font-size: 15px; font-weight: 500; color: var(--muted); }
+  .plan .for { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .plan ul { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+  .plan li { padding: 7px 0; border-top: 1px solid var(--line); }
+  .plan li::before { content: "✓"; color: var(--ok); margin-right: 8px; }
+  .plan .tag { margin-top: 16px; font-size: 12px; color: var(--muted); }
+
+  .privacy { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: start; }
+  .privacy ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .privacy li { margin-bottom: 8px; }
+  .privacy li b { color: var(--text); font-weight: 600; }
+
+  .beta { background: linear-gradient(135deg, rgba(232, 116, 59, 0.12), rgba(91, 155, 213, 0.08)); border: 1px solid var(--line); border-radius: 14px; padding: 36px; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .beta h2 { margin-bottom: 6px; }
+  .beta p { margin: 0; color: var(--muted); max-width: 56ch; }
+  .btn { display: inline-block; background: var(--rust); color: #14110f; font-weight: 700; padding: 12px 20px; border-radius: 8px; }
+  .btn:hover { text-decoration: none; filter: brightness(1.08); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 860px) {
+    .compare, .privacy { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .features, .plans { grid-template-columns: 1fr; }
+    .navlinks a:not(.keep) { display: none; }
+  }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } header.hero { padding-top: 56px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1d2128"/><path d="M6 21c4-9 16-9 20 0" stroke="#e8743b" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M9 21v4M23 21v4M16 15v10" stroke="#e8743b" stroke-width="3" stroke-linecap="round"/></svg>
+      RustBridge
+    </a>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#privacy">Privacy</a>
+      <a class="keep" href="https://github.com/auduvanttechnologies/rustbridge">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="pill">Free beta</span>
+    <h1>Write familiar. <em>Compile native.</em></h1>
+    <p class="lede">RustBridge translates Java into safe, idiomatic Rust, then compiles it, runs it, and repairs it until it prints exactly what your Java program prints. The Rust compiler and your program's own output check the work, not just a model.</p>
+    <div class="install">
+      <span class="prompt">$</span>
+      <code id="cmd">curl -fsSL https://rustbridge.auduvanttechnologies.com/install.sh | sh</code>
+      <button class="copy" type="button" data-copy="cmd">Copy</button>
+    </div>
+    <p class="sub-links">macOS and Linux. Needs Java 21+ and Rust. Or <a href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">download the jar</a> and run <code>java -jar rustbridge.jar</code>.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Java's references become Rust's borrows</h2>
+    <p class="section-lede">Translating line by line produces code that doesn't compile. RustBridge reads the compiler's errors and fixes the root cause, here by borrowing instead of moving, without scattering <code>.clone()</code> everywhere.</p>
+    <div class="compare">
+      <div class="code java">
+        <div class="bar"><b>Ownership.java</b><span>input</span></div>
+<pre><span class="kw">public class</span> <span class="ty">Ownership</span> {
+    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">String</span> name = <span class="str">"Genvium"</span>;
+        <span class="ty">String</span> name2 = name;
+        System.out.println(name2);
+        System.out.println(name.length());
+    }
+}</pre>
+      </div>
+      <div class="code rust">
+        <div class="bar"><b>src/main.rs</b><span>compiled, output matches</span></div>
+<pre><span class="kw">fn</span> main() {
+    <span class="kw">let</span> name = <span class="ty">String</span>::from(<span class="str">"Genvium"</span>);
+    <span class="kw">let</span> name2 = <span class="hl">&amp;name</span>;
+    println!(<span class="str">"{}"</span>, name2);
+    println!(<span class="str">"{}"</span>, name.len());
+}
+<span class="cm">// first attempt moved `name` (error E0382);</span>
+<span class="cm">// the repair borrows it instead of cloning</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="section-lede">Compiling and running happen on your machine. RustBridge only sends the model what it needs to translate and repair.</p>
+    <div class="steps">
+      <div class="step"><h3>Analyze</h3><p>A real Java parser maps classes, interfaces and risky constructs before any model sees your code.</p></div>
+      <div class="step"><h3>Translate</h3><p>The model writes Rust using a small runtime that reproduces Java's number formatting, <code>String.format</code>, and <code>HashMap</code> order.</p></div>
+      <div class="step"><h3>Compile &amp; repair</h3><p><code>cargo build</code> runs locally. Compiler errors go back for targeted fixes until it builds.</p></div>
+      <div class="step"><h3>Compare</h3><p>Your Java program and the Rust both run. Any difference in output triggers another repair.</p></div>
+    </div>
+<div class="term"><span class="p">$</span> rustbridge translate Ownership.java
+Translating Ownership.java with RustBridge API
+  analysis: 1 type(s) [class Ownership], 1 method(s), has main()
+  <span class="dim">2 of 3 free translations left this month</span>
+  attempt 1 (TRANSLATE): 1 compile error(s)
+  attempt 2 (FIX_COMPILE): compiles, output matches
+
+Result:  <span class="ok">Compiles and output matches Java</span>
+Project: rust-out/Ownership
+Report:  rust-out/Ownership/rustbridge-report.md</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What you get</h2>
+    <p class="section-lede">Every translation comes with a Cargo project and a report a human can review.</p>
+    <div class="features">
+      <div class="feature"><h3>Output-verified</h3><p>Byte-for-byte comparison against your Java program's real output, including doubles, formatting and map order.</p></div>
+      <div class="feature"><h3>No faked results</h3><p>RustBridge flags translations that copy expected output into the code instead of computing it.</p></div>
+      <div class="feature"><h3>Idiom report</h3><p>Counts clones, <code>RefCell</code>s, <code>unwrap</code>s and <code>unsafe</code>, plus decisions worth a second look.</p></div>
+      <div class="feature"><h3>Safe Rust only</h3><p>Standard library plus the RustBridge runtime. No external crates, no <code>unsafe</code>.</p></div>
+      <div class="feature"><h3>Tested on hard Java</h3><p>Built against a 70-program test suite: shared mutable state, inheritance, exceptions, generics, regex, overflow, UTF-16.</p></div>
+      <div class="feature"><h3>Spring Boot next</h3><p>The beta handles single-file programs. Multi-file projects and Spring Boot services are coming next.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <h2>Pricing</h2>
+    <p class="section-lede">Free for learners. A translation is one file, including all its repairs, and a translation that fails at the first step isn't counted.</p>
+    <div class="plans">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">$0</div>
+        <p class="for">For students and the curious</p>
+        <ul>
+          <li>3 translations a month</li>
+          <li>Files up to 300 lines</li>
+          <li>Sign in with GitHub</li>
+        </ul>
+      </div>
+      <div class="plan featured">
+        <h3>Pro</h3>
+        <div class="price">$15 <small>/ month per seat</small></div>
+        <p class="for">For developers moving real code</p>
+        <ul>
+          <li>Unlimited translations</li>
+          <li>No line limit</li>
+          <li>Everything in Free</li>
+        </ul>
+        <p class="tag">Available at launch in January 2027.</p>
+      </div>
+      <div class="plan">
+        <h3>Your own key</h3>
+        <div class="price">$0 <small>+ your Anthropic usage</small></div>
+        <p class="for">Bring an Anthropic API key</p>
+        <ul>
+          <li>Unlimited translations</li>
+          <li>No line limit</li>
+          <li>No sign-in needed</li>
+        </ul>
+        <p class="tag"><code>--provider anthropic</code> with <code>ANTHROPIC_API_KEY</code> set.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap privacy">
+    <div>
+      <h2>Your code stays yours</h2>
+      <p class="section-lede">RustBridge needs your source to translate it. It doesn't need to keep it.</p>
+    </div>
+    <ul>
+      <li><b>No code is stored.</b> Source is sent for each model call and discarded. Only counts are kept: tokens, repairs, pass or fail.</li>
+      <li><b>Compiling and running stay local.</b> Your Java and the generated Rust run on your machine, not ours.</li>
+      <li><b>Your API key isn't stored.</b> With your own Anthropic key, it's used for that one request and never saved.</li>
+      <li><b>Anonymous reports can be turned off.</b> Set <code>RUSTBRIDGE_NO_REPORT=1</code>. Reports never include code.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="beta">
+      <div>
+        <h2>Help shape the beta</h2>
+        <p>Try it on your own Java and tell us what broke. Failing programs, with your permission, become test cases that make the next version better.</p>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap">
+        <a class="btn" href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">Download</a>
+        <a class="btn ghost" href="https://github.com/auduvanttechnologies/rustbridge/issues/new">Send feedback</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 <a href="https://www.auduvanttechnologies.com">Auduvant Technologies</a></span>
+    <span>RustBridge is an independent project and is not affiliated with the Rust Foundation or Oracle.</span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.dataset.copy).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+      });
+    });
+  });
+</script>
+</body>
+</html>
