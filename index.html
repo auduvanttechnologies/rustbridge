@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RustBridge: Java to Rust, verified by the compiler</title>
-<meta name="description" content="RustBridge translates Java (TypeScript next) into safe, idiomatic Rust, then compiles it, runs it, and repairs it until its output matches your Java program.">
+<title>RustBridge: Java and TypeScript to Rust, verified by the compiler</title>
+<meta name="description" content="RustBridge translates Java, TypeScript and JavaScript into safe, idiomatic Rust, then compiles it, runs it, and repairs it until its output matches your Java program.">
 <meta property="og:title" content="RustBridge: Write familiar. Compile native.">
-<meta property="og:description" content="Java to Rust translation, verified by the Rust compiler and by your program's own output.">
+<meta property="og:description" content="Java and TypeScript to Rust, verified by the Rust compiler and by your program's own output.">
 <meta property="og:url" content="https://rustbridge.auduvanttechnologies.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314161a'/%3E%3Cpath d='M6 21c4-9 16-9 20 0' stroke='%23e8743b' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M9 21v4M23 21v4M16 15v10' stroke='%23e8743b' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
@@ -138,19 +138,19 @@
   <div class="wrap">
     <span class="pill">Free beta</span>
     <h1>Write familiar. <em>Compile native.</em></h1>
-    <p class="lede">RustBridge translates Java into safe, idiomatic Rust, then compiles it, runs it, and repairs it until it prints exactly what your Java program prints. The Rust compiler and your program's own output check the work, not just a model.</p>
+    <p class="lede">RustBridge translates Java, TypeScript and JavaScript into safe, idiomatic Rust, then compiles it, runs it, and repairs it until it prints exactly what your original program prints. The Rust compiler and your program's own output check the work, not just a model.</p>
     <div class="install">
       <span class="prompt">$</span>
       <code id="cmd">curl -fsSL https://rustbridge.auduvanttechnologies.com/install.sh | sh</code>
       <button class="copy" type="button" data-copy="cmd">Copy</button>
     </div>
-    <p class="sub-links">macOS and Linux. Needs Java 21+ and Rust. Or <a href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">download the jar</a> and run <code>java -jar rustbridge.jar</code>.</p>
+    <p class="sub-links">macOS and Linux. Needs Java 21+, Rust, and Node 22+ for TypeScript. Or <a href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">download the jar</a> and run <code>java -jar rustbridge.jar</code>.</p>
   </div>
 </header>
 
 <section>
   <div class="wrap">
-    <h2>Java's references become Rust's borrows</h2>
+    <h2>Shared references become Rust's borrows</h2>
     <p class="section-lede">Translating line by line produces code that doesn't compile. RustBridge reads the compiler's errors and fixes the root cause, here by borrowing instead of moving, without scattering <code>.clone()</code> everywhere.</p>
     <div class="compare">
       <div class="code java">
@@ -184,10 +184,10 @@
     <h2>How it works</h2>
     <p class="section-lede">Compiling and running happen on your machine. RustBridge only sends the model what it needs to translate and repair.</p>
     <div class="steps">
-      <div class="step"><h3>Analyze</h3><p>A real Java parser maps classes, interfaces and risky constructs before any model sees your code.</p></div>
-      <div class="step"><h3>Translate</h3><p>The model writes Rust using a small runtime that reproduces Java's number formatting, <code>String.format</code>, and <code>HashMap</code> order.</p></div>
+      <div class="step"><h3>Analyze</h3><p>RustBridge maps classes, interfaces, unions and risky constructs before any model sees your code.</p></div>
+      <div class="step"><h3>Translate</h3><p>The model writes Rust using small runtimes that reproduce Java's and JavaScript's number formatting, <code>console.log</code>, and map order.</p></div>
       <div class="step"><h3>Compile &amp; repair</h3><p><code>cargo build</code> runs locally. Compiler errors go back for targeted fixes until it builds.</p></div>
-      <div class="step"><h3>Compare</h3><p>Your Java program and the Rust both run. Any difference in output triggers another repair.</p></div>
+      <div class="step"><h3>Compare</h3><p>Your original program (with Java or Node) and the Rust both run. Any difference in output triggers another repair.</p></div>
     </div>
 <div class="term"><span class="p">$</span> rustbridge translate Ownership.java
 Translating Ownership.java with RustBridge API
@@ -207,12 +207,12 @@ Report:  rust-out/Ownership/rustbridge-report.md</div>
     <h2>What you get</h2>
     <p class="section-lede">Every translation comes with a Cargo project and a report a human can review.</p>
     <div class="features">
-      <div class="feature"><h3>Output-verified</h3><p>Byte-for-byte comparison against your Java program's real output, including doubles, formatting and map order.</p></div>
+      <div class="feature"><h3>Output-verified</h3><p>Byte-for-byte comparison against your program's real output, including number formatting, <code>console.log</code> layout and map order.</p></div>
       <div class="feature"><h3>No faked results</h3><p>RustBridge flags translations that copy expected output into the code instead of computing it.</p></div>
       <div class="feature"><h3>Idiom report</h3><p>Counts clones, <code>RefCell</code>s, <code>unwrap</code>s and <code>unsafe</code>, plus decisions worth a second look.</p></div>
       <div class="feature"><h3>Safe Rust only</h3><p>Standard library plus the RustBridge runtime. No external crates, no <code>unsafe</code>.</p></div>
-      <div class="feature"><h3>Tested on hard Java</h3><p>Built against a 70-program test suite: shared mutable state, inheritance, exceptions, generics, regex, overflow, UTF-16.</p></div>
-      <div class="feature"><h3>TypeScript next</h3><p>Java today. TypeScript and JavaScript are next, then multi-file projects and Spring Boot. The goal: most languages, one compiler-checked path to Rust.</p></div>
+      <div class="feature"><h3>Tested on hard code</h3><p>Built against 120 test programs in Java and TypeScript: shared state, inheritance, unions, closures, generics, regex, int32 math, UTF-16.</p></div>
+      <div class="feature"><h3>More languages</h3><p>Java, TypeScript and JavaScript today, single files. Multi-file projects and Spring Boot are next. The goal: most languages, one compiler-checked path to Rust.</p></div>
     </div>
   </div>
 </section>
@@ -278,8 +278,8 @@ Report:  rust-out/Ownership/rustbridge-report.md</div>
     <div class="beta">
       <div>
         <h2>Help shape the beta</h2>
-        <p>Try it on your own Java and tell us what broke. Failing programs, with your permission, become test cases that make the next version better.</p>
-        <p style="margin-top:10px">After TypeScript, which language should RustBridge translate? <a href="https://github.com/auduvanttechnologies/rustbridge/discussions">Vote here</a>.</p>
+        <p>Try it on your own Java or TypeScript and tell us what broke. Failing programs, with your permission, become test cases that make the next version better.</p>
+        <p style="margin-top:10px">Which language should RustBridge translate next? <a href="https://github.com/auduvanttechnologies/rustbridge/discussions">Vote here</a>.</p>
       </div>
       <div style="display:flex; gap:12px; flex-wrap:wrap">
         <a class="btn" href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">Download</a>
