@@ -1,14 +1,14 @@
 # RustBridge
 
-**Write familiar. Compile native.** RustBridge translates Java into safe, idiomatic Rust, then compiles it, runs it, and repairs it until it prints exactly what your Java program prints.
+**Write familiar. Compile native.** RustBridge translates Java, TypeScript and JavaScript into safe, idiomatic Rust, then compiles it, runs it, and repairs it until it prints exactly what your original program prints.
 
 Website: https://rustbridge.auduvanttechnologies.com
 
-> Free beta. Single-file Java programs today. TypeScript and JavaScript are next, then multi-file projects and Spring Boot.
+> Free beta. Single-file Java, TypeScript and JavaScript programs today. Multi-file projects and Spring Boot are next.
 
 ## Install
 
-You need **Java 21+** and **Rust** (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`).
+You need **Java 21+**, **Rust**, and **Node.js 22+** for TypeScript/JavaScript (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`).
 
 macOS and Linux:
 
@@ -23,11 +23,11 @@ Or download `rustbridge.jar` from the [latest release](https://github.com/auduva
 ```bash
 rustbridge selftest                 # checks java, cargo and the repair loop (no account needed)
 rustbridge login                    # sign in with GitHub
-rustbridge translate MyProgram.java # writes rust-out/MyProgram/ with a Cargo project and a report
+rustbridge translate MyProgram.java # or .ts / .js; writes rust-out/MyProgram/ with a Cargo project and a report
 rustbridge whoami                   # plan and translations left this month
 ```
 
-RustBridge runs your Java program first to capture its output, then checks that the Rust prints the same thing. Use `--no-run` to only require that the Rust compiles.
+RustBridge runs your original program first (with Java or Node) to capture its output, then checks that the Rust prints the same thing. Use `--no-run` to only require that the Rust compiles.
 
 ## Plans
 
@@ -53,8 +53,8 @@ rustbridge translate MyProgram.java --provider anthropic
 
 ## Feedback
 
-Found a program RustBridge gets wrong? [Open an issue](https://github.com/auduvanttechnologies/rustbridge/issues/new). Include the Java file only if you're happy for it to become a test case.
+Found a program RustBridge gets wrong? [Open an issue](https://github.com/auduvanttechnologies/rustbridge/issues/new). Include the source file only if you're happy for it to become a test case.
 
-Which language should RustBridge translate after TypeScript? [Vote in Discussions](https://github.com/auduvanttechnologies/rustbridge/discussions).
+Which language should RustBridge translate next? [Vote in Discussions](https://github.com/auduvanttechnologies/rustbridge/discussions).
 
 © 2026 Auduvant Technologies. This repository holds the website and releases; the RustBridge source is private.
