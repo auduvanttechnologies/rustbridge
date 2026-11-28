@@ -4,7 +4,7 @@
 
 Website: https://rustbridge.auduvanttechnologies.com
 
-> Free beta. Single-file Java programs today; multi-file projects and Spring Boot are next.
+> Free beta. Single-file Java programs today. TypeScript and JavaScript are next, then multi-file projects and Spring Boot.
 
 ## Install
 
@@ -54,5 +54,7 @@ rustbridge translate MyProgram.java --provider anthropic
 ## Feedback
 
 Found a program RustBridge gets wrong? [Open an issue](https://github.com/auduvanttechnologies/rustbridge/issues/new). Include the Java file only if you're happy for it to become a test case.
+
+Which language should RustBridge translate after TypeScript? [Vote in Discussions](https://github.com/auduvanttechnologies/rustbridge/discussions).
 
 © 2026 Auduvant Technologies. This repository holds the website and releases; the RustBridge source is private.
