@@ -27,6 +27,11 @@ if ! command -v cargo >/dev/null 2>&1; then
   say "  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
 fi
 
+# Node (only for TypeScript/JavaScript)
+if ! command -v node >/dev/null 2>&1; then
+  say "Note: node was not found. Install Node.js 22+ (https://nodejs.org) to translate TypeScript or JavaScript."
+fi
+
 mkdir -p "$HOME_DIR" "$BIN_DIR"
 say "Downloading rustbridge.jar..."
 curl -fsSL "$JAR_URL" -o "$HOME_DIR/rustbridge.jar.tmp"
