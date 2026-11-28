@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RustBridge: Java to Rust, verified by the compiler</title>
-<meta name="description" content="RustBridge translates Java into safe, idiomatic Rust, then compiles it, runs it, and repairs it until its output matches your Java program.">
+<meta name="description" content="RustBridge translates Java (TypeScript next) into safe, idiomatic Rust, then compiles it, runs it, and repairs it until its output matches your Java program.">
 <meta property="og:title" content="RustBridge: Write familiar. Compile native.">
 <meta property="og:description" content="Java to Rust translation, verified by the Rust compiler and by your program's own output.">
 <meta property="og:url" content="https://rustbridge.auduvanttechnologies.com/">
@@ -212,7 +212,7 @@ Report:  rust-out/Ownership/rustbridge-report.md</div>
       <div class="feature"><h3>Idiom report</h3><p>Counts clones, <code>RefCell</code>s, <code>unwrap</code>s and <code>unsafe</code>, plus decisions worth a second look.</p></div>
       <div class="feature"><h3>Safe Rust only</h3><p>Standard library plus the RustBridge runtime. No external crates, no <code>unsafe</code>.</p></div>
       <div class="feature"><h3>Tested on hard Java</h3><p>Built against a 70-program test suite: shared mutable state, inheritance, exceptions, generics, regex, overflow, UTF-16.</p></div>
-      <div class="feature"><h3>Spring Boot next</h3><p>The beta handles single-file programs. Multi-file projects and Spring Boot services are coming next.</p></div>
+      <div class="feature"><h3>TypeScript next</h3><p>Java today. TypeScript and JavaScript are next, then multi-file projects and Spring Boot. The goal: most languages, one compiler-checked path to Rust.</p></div>
     </div>
   </div>
 </section>
@@ -279,6 +279,7 @@ Report:  rust-out/Ownership/rustbridge-report.md</div>
       <div>
         <h2>Help shape the beta</h2>
         <p>Try it on your own Java and tell us what broke. Failing programs, with your permission, become test cases that make the next version better.</p>
+        <p style="margin-top:10px">After TypeScript, which language should RustBridge translate? <a href="https://github.com/auduvanttechnologies/rustbridge/discussions">Vote here</a>.</p>
       </div>
       <div style="display:flex; gap:12px; flex-wrap:wrap">
         <a class="btn" href="https://github.com/auduvanttechnologies/rustbridge/releases/latest">Download</a>
